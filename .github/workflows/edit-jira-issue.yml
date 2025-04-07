@@ -1,0 +1,50 @@
+name: Edit Jira Issue
+
+on:
+  issues:
+    types:
+      - edited
+
+jobs:
+  update-jira:
+    runs-on: ubuntu-latest
+
+    env:
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      ISSUE_URL: ${{ github.event.issue.html_url }}
+
+    steps:
+      - name: Extract Jira Issue Key from title
+        id: extract-key
+        run: |
+          echo "Extracting Jira Issue Key..."
+          echo "JIRA_KEY=$(echo $ISSUE_TITLE | grep -oE '[A-Z]+-[0-9]+')" >> $GITHUB_ENV
+
+      - name: Convert markdown to Jira format
+        id: md2jira
+        uses: peter-evans/jira2md@v1
+        with:
+          input-text: |
+            ### Github Issue Link
+            - ${{ env.ISSUE_URL }}
+
+            ${{ env.ISSUE_BODY }}
+          mode: md2jira
+
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+
+      - name: Update Jira Issue
+        uses: atlassian/gajira-edit@v3
+        with:
+          issue: ${{ env.JIRA_KEY }}
+          fields: |
+            {
+              "summary": "${{ env.ISSUE_TITLE }}",
+              "description": "${{ steps.md2jira.outputs.output-text }}"
+            }
