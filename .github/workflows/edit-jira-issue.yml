@@ -19,7 +19,7 @@ jobs:
         id: extract-key
         run: |
           echo "Extracting Jira Issue Key..."
-          echo "JIRA_KEY=$(echo $ISSUE_TITLE | grep -oE '[A-Z]+-[0-9]+')" >> $GITHUB_ENV
+          echo "JIRA_KEY=$(echo '${{ github.event.issue.title }}' | grep -oE '[A-Z]+-[0-9]+')" >> $GITHUB_ENV
 
       - name: Convert markdown to Jira format
         id: md2jira
@@ -28,7 +28,6 @@ jobs:
           input-text: |
             ### Github Issue Link
             - ${{ env.ISSUE_URL }}
-
             ${{ env.ISSUE_BODY }}
           mode: md2jira
 
@@ -41,13 +40,16 @@ jobs:
 
       - name: Update Jira issue via REST API
         run: |
+          SUMMARY=$(jq -Rn --arg s "${{ env.ISSUE_TITLE }}" '$s')
+          DESCRIPTION=$(jq -Rn --arg d "${{ steps.md2jira.outputs.output-text }}" '$d')
+
           curl --request PUT \
             --url "${{ secrets.JIRA_BASE_URL }}/rest/api/2/issue/${{ env.JIRA_KEY }}" \
             --user "${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
             --header 'Content-Type: application/json' \
-            --data '{
-              "fields": {
-                "summary": "'"${{ env.ISSUE_TITLE }}"'",
-                "description": "'"${{ steps.md2jira.outputs.output-text }}"'"
+            --data "{
+              \"fields\": {
+                \"summary\": $SUMMARY,
+                \"description\": $DESCRIPTION
               }
-            }'
+            }"
