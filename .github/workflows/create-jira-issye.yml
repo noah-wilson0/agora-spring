@@ -1,12 +1,15 @@
 name: Create Jira issue
+
 on:
   issues:
     types:
       - opened
+
 jobs:
   create-issue:
     name: Create Jira issue
     runs-on: ubuntu-latest
+
     steps:
       - name: Login
         uses: atlassian/gajira-login@v3
@@ -28,9 +31,10 @@ jobs:
 
       - name: Log Issue Parser
         run: |
-          echo '${{ steps.issue-parser.outputs.issueparser_parentKey }}'
-          echo '${{ steps.issue-parser.outputs.__ticket_number }}'
-          echo '${{ steps.issue-parser.outputs.jsonString }}'
+          echo "parentKey = ${{ steps.issue-parser.outputs.issueparser_parentKey }}"
+          echo "branch = ${{ steps.issue-parser.outputs.issueparser_branch }}"
+          echo "description = ${{ steps.issue-parser.outputs.issueparser_description }}"
+          echo "tasks = ${{ steps.issue-parser.outputs.issueparser_tasks }}"
 
       - name: Convert markdown to Jira Syntax
         uses: peter-evans/jira2md@v1
@@ -39,16 +43,36 @@ jobs:
           input-text: |
             ### Github Issue Link
             - ${{ github.event.issue.html_url }}
-
             ${{ github.event.issue.body }}
           mode: md2jira
+
+      - name: Get Jira parent issue info
+        id: parentinfo
+        run: |
+          response=$(curl -s -u "${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            -H "Accept: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/2/issue/${{ steps.issue-parser.outputs.issueparser_parentKey }}")
+          
+          echo "$response"
+          
+          hierarchyLevel=$(echo "$response" | jq '.fields.issuetype.hierarchyLevel')
+          echo "hierarchyLevel=$hierarchyLevel" >> $GITHUB_ENV
+
+      - name: Set issue type dynamically
+        id: issuetype
+        run: |
+          if [[ "$hierarchyLevel" -eq 0 ]]; then
+            echo "issuetype=Sub-task" >> $GITHUB_ENV
+          else
+            echo "issuetype=Task" >> $GITHUB_ENV
+          fi
 
       - name: Create Issue
         id: create
         uses: atlassian/gajira-create@v3
         with:
           project: INOUT
-          issuetype: Sub-task
+          issuetype: ${{ env.issuetype }}
           summary: '${{ github.event.issue.title }}'
           description: '${{ steps.md2jira.outputs.output-text }}'
           fields: |
@@ -59,7 +83,7 @@ jobs:
             }
 
       - name: Log created issue
-        run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create.outputs.issue }} was created"
+        run: echo "Jira Issue ${{ steps.create.outputs.issue }} was created"
 
       - name: Checkout jiratest code
         uses: actions/checkout@v4
@@ -69,7 +93,7 @@ jobs:
       - name: Create branch with Ticket number
         run: |
           ISSUE_NUMBER="${{ steps.create.outputs.issue }}"
-          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch}}"
+          ISSUE_TITLE="${{ steps.issue-parser.outputs.issueparser_branch }}"
           BRANCH_NAME="${ISSUE_NUMBER}-$(echo ${ISSUE_TITLE} | sed 's/ /-/g')"
           git checkout -b "${BRANCH_NAME}"
           git push origin "${BRANCH_NAME}"
@@ -88,4 +112,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
           body: 'Jira Issue Created: [${{ steps.create.outputs.issue }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ steps.create.outputs.issue }})'
-      
