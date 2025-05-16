@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/signup")
+@RequestMapping("/member/signup")
 @RequiredArgsConstructor
 public class MemberSignUpController {
 
