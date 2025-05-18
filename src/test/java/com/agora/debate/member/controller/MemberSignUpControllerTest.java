@@ -24,9 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @Slf4j
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
-class MemberSignUpControllerIntegrationTest {
+class MemberSignUpControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,6 +34,9 @@ class MemberSignUpControllerIntegrationTest {
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+
+
 
     @DisplayName("유효성_검사_실패_닉네임_없음")
     @WithMockUser
@@ -47,7 +50,7 @@ class MemberSignUpControllerIntegrationTest {
                 .birthday(LocalDate.parse("2001-08-03"))
                 .build();
 
-        MvcResult response = mockMvc.perform(post("/api/signup")
+        MvcResult response = mockMvc.perform(post("/member/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
@@ -72,7 +75,7 @@ class MemberSignUpControllerIntegrationTest {
                 .birthday(LocalDate.parse("2001-08-03"))
                 .build();
 
-        MvcResult response = mockMvc.perform(post("/api/signup")
+        MvcResult response = mockMvc.perform(post("/member/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())

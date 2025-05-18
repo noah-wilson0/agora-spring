@@ -16,7 +16,8 @@ import java.time.LocalDate;
 public class SignUpDto {
 
     // 닉네임: 한글, 영문, 숫자 2~15자
-    @NotBlank(groups = {ValidationGroups.SignUpGroup.class, ValidationGroups.UserUpdateGroup.class})
+    @NotBlank(message = "닉네임은 반드시 입력되어야 합니다.",
+            groups = {ValidationGroups.SignUpGroup.class, ValidationGroups.UserUpdateGroup.class})
     @Pattern(
             regexp = "^[가-힣a-zA-Z0-9]{2,15}$",
             message = "닉네임은 한글, 영문, 숫자 조합 2~15자여야 합니다.",
@@ -25,7 +26,8 @@ public class SignUpDto {
     private String name;
 
     // 아이디: 영문 + 숫자 6~12자
-    @NotBlank(groups = ValidationGroups.SignUpGroup.class)
+    @NotBlank(message = "아이디는 반드시 입력되어야 합니다.",
+            groups = ValidationGroups.SignUpGroup.class)
     @Pattern(
             regexp = "^[a-zA-Z0-9]{6,12}$",
             message = "아이디는 영문과 숫자 조합 6~12자여야 합니다.",
