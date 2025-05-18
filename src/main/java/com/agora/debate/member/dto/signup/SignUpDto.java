@@ -36,6 +36,8 @@ public class SignUpDto {
     private String loginId;
 
     // 비밀번호: 영문, 숫자, 특수문자 포함 8~15자
+    @NotBlank(message = "비밀번호는 반드시 입력되어야 합니다.",
+            groups = ValidationGroups.SignUpGroup.class)
     @Pattern(
             regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()\\-_=\\+{}\\[\\]:;,.?/])[A-Za-z\\d!@#$%^&*()\\-_=\\+{}\\[\\]:;,.?/]{8,15}$",
             message = "비밀번호는 영문, 숫자, 특수문자를 포함한 8~15자여야 합니다.",
@@ -44,6 +46,8 @@ public class SignUpDto {
     private String password;
 
     // 이메일: '@' 포함한 일반 이메일 형식
+    @NotBlank(message = "이메일은 반드시 입력되어야 합니다.",
+            groups = ValidationGroups.SignUpGroup.class)
     @Email(
             message = "올바른 이메일 형식이어야 합니다.",
             groups = {ValidationGroups.SignUpGroup.class, ValidationGroups.UserUpdateGroup.class}
