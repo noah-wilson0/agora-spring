@@ -39,7 +39,7 @@ public class MemberSignUpController {
                     .collect(Collectors.toMap(
                             error -> error.getField(),
                             error -> error.getDefaultMessage(),
-                            (msg1, msg2) -> msg1 + "; " + msg2
+                            (msg1, msg2) -> msg1 + ", " + msg2
                     ));
 
             ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()

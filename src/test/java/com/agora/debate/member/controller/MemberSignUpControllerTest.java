@@ -62,6 +62,29 @@ class MemberSignUpControllerTest {
         log.info("응답 본문: {}", responseBody);
     }
 
+    @DisplayName("다중_유효성_검사_실패")
+    @WithMockUser
+    @Test
+    void createMemberNameErrors() throws Exception {
+        SignUpDto dto = SignUpDto.builder()
+                .password("test1234678@")
+                .email("test@naver.com")
+                .gender(Gender.MALE)
+                .birthday(LocalDate.parse("2001-08-03"))
+                .build();
+
+        MvcResult response = mockMvc.perform(post("/member/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andDo(print())
+                .andReturn();
+
+        int actualStatus = response.getResponse().getStatus();
+        String responseBody = response.getResponse().getContentAsString();
+        log.info("응답 상태: {}", actualStatus);
+        log.info("응답 본문: {}", responseBody);
+    }
+
     @DisplayName("유효성_검사_성공")
     @WithMockUser
     @Test
