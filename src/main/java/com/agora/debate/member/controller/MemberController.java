@@ -33,7 +33,7 @@ public class MemberController {
         return ResponseEntity.ok(MemberDto.builder()
                 .id(member.getId())
                 .name(member.getName())
-                .loginId(member.getLoginId())
+                .loginId(member.getUsername())
                 .email(member.getEmail())
                 .gender(member.getGender())
                 .birthday(member.getBirthday())

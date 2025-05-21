@@ -9,9 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,6 +32,9 @@ class MemberSignUpControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -43,14 +47,14 @@ class MemberSignUpControllerTest {
     @Test
     void createMemberNameError() throws Exception {
         SignUpDto dto = SignUpDto.builder()
-                .loginId("test1234")
+                .username("test1234")
                 .password("test1234678@")
                 .email("test@naver.com")
                 .gender(Gender.MALE)
                 .birthday(LocalDate.parse("2001-08-03"))
                 .build();
 
-        MvcResult response = mockMvc.perform(post("/member/signup")
+        MvcResult response = mockMvc.perform(post("/members/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
@@ -73,7 +77,7 @@ class MemberSignUpControllerTest {
                 .birthday(LocalDate.parse("2001-08-03"))
                 .build();
 
-        MvcResult response = mockMvc.perform(post("/member/signup")
+        MvcResult response = mockMvc.perform(post("/members/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
@@ -91,14 +95,14 @@ class MemberSignUpControllerTest {
     void createMember() throws Exception {
         SignUpDto dto = SignUpDto.builder()
                 .name("Test")
-                .loginId("test1234")
+                .username("test1234")
                 .password("test1234678@")
                 .email("test@naver.com")
                 .gender(Gender.MALE)
                 .birthday(LocalDate.parse("2001-08-03"))
                 .build();
 
-        MvcResult response = mockMvc.perform(post("/member/signup")
+        MvcResult response = mockMvc.perform(post("/members/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
@@ -109,4 +113,5 @@ class MemberSignUpControllerTest {
         log.info("응답 상태: {}", actualStatus);
         log.info("응답 본문: {}", responseBody);
     }
+
 }

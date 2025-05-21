@@ -19,7 +19,7 @@ public class MemberSignUpPolicyChecker {
     }
 
     public boolean validateDuplicateLoginId(String loginId) {
-        if (memberRepository.existsByLoginId(loginId)) {
+        if (memberRepository.existsByUsername(loginId)) {
             throw new DuplicateMemberException("이미 존재하는 아이디입니다.");
         }
         return true;

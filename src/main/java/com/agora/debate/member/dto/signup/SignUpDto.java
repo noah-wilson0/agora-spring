@@ -2,7 +2,6 @@ package com.agora.debate.member.dto.signup;
 
 import com.agora.debate.global.enums.Gender;
 import com.agora.debate.member.valid.ValidationGroups;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -33,7 +32,7 @@ public class SignUpDto {
             message = "아이디는 영문과 숫자 조합 6~12자여야 합니다.",
             groups = ValidationGroups.SignUpGroup.class
     )
-    private String loginId;
+    private String username;
 
     // 비밀번호: 영문, 숫자, 특수문자 포함 8~15자
     @NotBlank(message = "비밀번호는 반드시 입력되어야 합니다.",

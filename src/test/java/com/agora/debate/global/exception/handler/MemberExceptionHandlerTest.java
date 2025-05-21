@@ -2,8 +2,6 @@ package com.agora.debate.global.exception.handler;
 
 import com.agora.debate.global.enums.Gender;
 import com.agora.debate.member.dto.signup.SignUpDto;
-import com.agora.debate.member.entity.Member;
-import com.agora.debate.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -45,7 +43,7 @@ class MemberExceptionHandlerTest {
     void setup() throws Exception{
         SignUpDto dto = SignUpDto.builder()
                 .name("중복테스트1")
-                .loginId("test12345")  // ← DB에 이미 존재하는 값
+                .username("test12345")  // ← DB에 이미 존재하는 값
                 .password("test1234678@1")
                 .email("new@naver.com1")
                 .gender(Gender.MALE)
@@ -66,7 +64,7 @@ class MemberExceptionHandlerTest {
         // 중복 loginId 전송
         SignUpDto dto = SignUpDto.builder()
                 .name("중복테스트2")
-                .loginId("test12345")  // ← DB에 이미 존재하는 값
+                .username("test12345")  // ← DB에 이미 존재하는 값
                 .password("test1234678@2")
                 .email("new@naver.com2")
                 .gender(Gender.MALE)

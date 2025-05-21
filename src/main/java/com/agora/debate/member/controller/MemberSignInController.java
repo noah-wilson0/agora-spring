@@ -1,9 +1,8 @@
 package com.agora.debate.member.controller;
 
-
 import com.agora.debate.member.dto.ApiErrorResponse;
-import com.agora.debate.member.dto.ApiResponse;
-import com.agora.debate.member.dto.signup.SignUpDto;
+import com.agora.debate.member.dto.signin.SignInDto;
+import com.agora.debate.member.security.dto.JwtToken;
 import com.agora.debate.member.service.MemberService;
 import com.agora.debate.member.valid.ValidationGroups;
 import lombok.RequiredArgsConstructor;
@@ -21,29 +20,27 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * TODO : Swagger-UI 적용시켜보기
- *
- *
+ * TODO : 로그인 구현
+ *  로그인시 jwt(http only cookie사용, 추후 secure cookie 사용해보기) 발급 시큐어 인증 후 인가되는 구조로 "추후" 변경
  */
 @Slf4j
 @RestController
-@RequestMapping("/members/signup")
+@RequestMapping("/members/sign-in")
 @RequiredArgsConstructor
-public class MemberSignUpController {
-
+public class MemberSignInController {
     private final MemberService memberService;
 
-    @PostMapping
-    public ResponseEntity<?> createMember(@RequestBody @Validated(ValidationGroups.SignUpGroup.class) SignUpDto signUpDto, Errors errors) {
 
+    @PostMapping
+    public ResponseEntity<?> signIn(@RequestBody @Validated(ValidationGroups.LoginGroup.class) SignInDto signInDto, Errors errors) {
         if (errors.hasErrors()) {
-            Map<String, String> fieldErrors = errors.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
+            log.info("signIn error");
+            Map<String, String> fieldErrors = errors.getFieldErrors().stream().
+                    collect(Collectors.toMap(
                             error -> error.getField(),
                             error -> error.getDefaultMessage(),
                             (msg1, msg2) -> msg1 + ", " + msg2
                     ));
-
             ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message("형식이 잘못되었습니다.")
@@ -52,19 +49,18 @@ public class MemberSignUpController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
         }
-        memberService.register(signUpDto);
+        JwtToken jwtToken = memberService.signIn(signInDto);
+        log.info("request username = {}, password = {}", signInDto.getUsername(), signInDto.getPassword());
+        log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
 
-
-        // 성공 시
-        ApiResponse<SignUpDto> successResponse = ApiResponse.<SignUpDto>builder()
-                .code(HttpStatus.CREATED.value())
-                .message("회원가입 성공")
-                .data(signUpDto)
-                .build();
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(jwtToken);
     }
 
+    @PostMapping("/test")
+    public ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
+
+        return ResponseEntity.ok(signInDto);
+    }
 
 
 

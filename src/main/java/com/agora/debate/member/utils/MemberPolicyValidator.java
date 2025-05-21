@@ -13,7 +13,7 @@ public class MemberPolicyValidator {
 
     public  void validateSignUpDto(SignUpDto signUpDto) {
         memberSignUpPolicyChecker.validateDuplicateName(signUpDto.getName());
-        memberSignUpPolicyChecker.validateDuplicateLoginId(signUpDto.getLoginId());
+        memberSignUpPolicyChecker.validateDuplicateLoginId(signUpDto.getUsername());
         memberSignUpPolicyChecker.validateDuplicateEmail(signUpDto.getEmail());
 
     }
