@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @Table(name = "category")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -19,7 +18,7 @@ public class Category {
     @Column(name = "category_name", nullable = false)
     private String categoryName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer part;
 }
 

@@ -16,6 +16,9 @@ Download for windows - AMD64 버전 설치
     docker run --name redis -p 6379:6379 -d redis
 입력 하면 redis image를 확인 후 없으면 설치
 
+    docker start redis
+생성 후엔 start로 키면 됨
+
     docker ps
 redis 컨테이너가 STATUS: UP 이면 실행 중
 
@@ -38,3 +41,7 @@ get foo
 
 ## Redis 종료
     docker stop redis
+
+# Redis setting (react)
+
+    npm install sockjs-client @stomp/stompjs
