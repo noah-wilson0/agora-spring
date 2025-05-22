@@ -56,12 +56,4 @@ public class MemberSignInController {
         return ResponseEntity.status(HttpStatus.OK).body(jwtToken);
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<?> signIn(@RequestBody SignInDto signInDto) {
-
-        return ResponseEntity.ok(signInDto);
-    }
-
-
-
 }

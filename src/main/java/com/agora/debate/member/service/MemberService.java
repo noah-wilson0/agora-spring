@@ -44,6 +44,7 @@ public class MemberService {
                 .email(signDto.getEmail())
                 .gender(signDto.getGender())
                 .birthday(signDto.getBirthday())
+                .roles(List.of("USER"))
                 .build());
     }
     @Transactional
