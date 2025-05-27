@@ -1,12 +1,13 @@
 package com.agora.debate.member;
 
 import com.agora.debate.member.repository.MemberRepository;
-import com.agora.debate.member.security.JwtTokenProvider;
+import com.agora.debate.security.JwtTokenProvider;
 import com.agora.debate.member.service.MemberService;
 import com.agora.debate.member.utils.MemberPolicyValidator;
 import com.agora.debate.member.utils.MemberSignUpPolicyChecker;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +46,10 @@ public class MemberTestConfig {
         // BCrypt Encoder 사용
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+    @Bean
+    public RedisTemplate redisTemplate() {
+        return mock(RedisTemplate.class);
+    }
 
     @Bean
     public MemberService memberService() {
@@ -53,7 +58,8 @@ public class MemberTestConfig {
                 memberPolicyValidator(),
                 jwtTokenProvider(),
                 authenticationManagerBuilder(),
-                passwordEncoder()
+                passwordEncoder(),
+                redisTemplate()
                 );
     }
 }

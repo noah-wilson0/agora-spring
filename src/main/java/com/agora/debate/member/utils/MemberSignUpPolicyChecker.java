@@ -1,6 +1,6 @@
 package com.agora.debate.member.utils;
 
-import com.agora.debate.global.exception.member.DuplicateMemberException;
+import com.agora.debate.member.exception.DuplicateMemberException;
 import com.agora.debate.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

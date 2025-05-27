@@ -1,7 +1,8 @@
-package com.agora.debate.global.handler;
+package com.agora.debate.member.handler;
 
-import com.agora.debate.global.exception.member.DuplicateMemberException;
-import com.agora.debate.global.exception.member.UserNameNotMatchException;
+import com.agora.debate.member.exception.DuplicateMemberException;
+import com.agora.debate.member.exception.UserNameNotMatchException;
+import com.agora.debate.security.excetion.InvalidJwtTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -28,5 +29,10 @@ public class MemberExceptionHandler {
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()))
                 .body(e.getMessage());
+    }
+
+    @ExceptionHandler(value = InvalidJwtTokenException.class)
+    public ResponseEntity<String> handleInvalidJwtTokenException(InvalidJwtTokenException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

@@ -1,7 +1,6 @@
 package com.agora.debate.member.controller;
 
 
-import com.agora.debate.member.dto.ApiErrorResponse;
 import com.agora.debate.member.dto.ApiResponse;
 import com.agora.debate.member.dto.signup.SignUpDto;
 import com.agora.debate.member.service.MemberService;
@@ -10,15 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * TODO : Swagger-UI 적용시켜보기
@@ -34,26 +29,8 @@ public class MemberSignUpController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<?> createMember(@RequestBody @Validated(ValidationGroups.SignUpGroup.class) SignUpDto signUpDto, Errors errors) {
-
-        if (errors.hasErrors()) {
-            Map<String, String> fieldErrors = errors.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            error -> error.getField(),
-                            error -> error.getDefaultMessage(),
-                            (msg1, msg2) -> msg1 + ", " + msg2
-                    ));
-
-            ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
-                    .code(HttpStatus.BAD_REQUEST.value())
-                    .message("형식이 잘못되었습니다.")
-                    .result(fieldErrors)
-                    .build();
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorResponse);
-        }
+    public ResponseEntity<?> createMember(@RequestBody @Validated(ValidationGroups.SignUpGroup.class) SignUpDto signUpDto) {
         memberService.register(signUpDto);
-
 
         // 성공 시
         ApiResponse<SignUpDto> successResponse = ApiResponse.<SignUpDto>builder()

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @ToString
 public class MemberInfo {
     private String name;
-    private String signInId;
+    private String username;
     private String email;
     private Gender gender;
     private LocalDate birthday;

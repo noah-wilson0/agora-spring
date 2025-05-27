@@ -1,8 +1,9 @@
-package com.agora.debate.member.security;
+package com.agora.debate.security;
 
 import com.agora.debate.member.entity.Member;
 import com.agora.debate.member.repository.MemberRepository;
-import com.agora.debate.member.security.dto.JwtToken;
+import com.agora.debate.security.dto.JwtToken;
+import com.agora.debate.security.excetion.InvalidJwtTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class JwtTokenProvider {
+public class  JwtTokenProvider {
     private final Key key;
     private final MemberRepository memberRepository;
 
@@ -56,6 +55,7 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
                 .setExpiration(new Date(now + 86400000))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -65,6 +65,34 @@ public class JwtTokenProvider {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+    public String generateAccessToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+
+        Date accessTokenExpiresIn = new Date(now + 86400000);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("auth", authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+    public Long getExpiryTime(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            Date expiration = claims.getExpiration();
+            return expiration.getTime(); // 만료 시간(Unix Timestamp, ms 단위)
+        } catch (ExpiredJwtException e) {
+            // 이미 만료된 토큰도 만료 시간은 추출 가능
+            return e.getClaims().getExpiration().getTime();
+        }
+
+
     }
 
     public Authentication getAuthentication(String accessToken) {
@@ -105,8 +133,8 @@ public class JwtTokenProvider {
     }
 
 
-    // accessToken
-    private Claims parseClaims(String accessToken) {
+
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -115,6 +143,8 @@ public class JwtTokenProvider {
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        } catch (JwtException e) {
+            throw new InvalidJwtTokenException("JWT 검증 실패",e);
         }
     }
 

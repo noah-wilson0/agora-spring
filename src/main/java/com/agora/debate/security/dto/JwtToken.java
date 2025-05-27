@@ -1,4 +1,4 @@
-package com.agora.debate.member.security.dto;
+package com.agora.debate.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

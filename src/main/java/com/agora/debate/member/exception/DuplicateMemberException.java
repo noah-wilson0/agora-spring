@@ -1,4 +1,4 @@
-package com.agora.debate.global.exception.member;
+package com.agora.debate.member.exception;
 
 public class DuplicateMemberException extends RuntimeException {
     public DuplicateMemberException() {

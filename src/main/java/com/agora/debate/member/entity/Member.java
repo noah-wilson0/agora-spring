@@ -97,4 +97,24 @@ public class Member implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeUsername(String newUsername) {
+        this.username = newUsername;
+    }
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+    public void changeGender(Gender gender) {
+        this.gender = gender;
+    }
+    public void changeBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
 }

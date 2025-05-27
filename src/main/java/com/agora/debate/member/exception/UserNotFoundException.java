@@ -1,4 +1,4 @@
-package com.agora.debate.global.exception.member;
+package com.agora.debate.member.exception;
 
 import com.agora.debate.global.exception.DataNotFoundException;
 
