@@ -21,10 +21,19 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
 
+    private String token=null;
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("필터 진행");
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+        // 🔐 OPTIONS 요청은 필터를 건너뛴다 (CORS preflight)
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            log.info("OPTIONS 요청 - 필터 우회");
+            chain.doFilter(request, response);
+            return;
+        }
 
         String path = httpRequest.getRequestURI();
 
@@ -35,7 +44,22 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             return;
         }
 
-        String token = resolveToken(httpRequest);
+
+        if (httpRequest.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    token=cookie.getValue();
+                }
+            }
+        }else{
+            log.info("토큰 없음");
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            SecurityContextHolder.clearContext();
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.setContentType("application/json; charset=UTF-8");
+            httpResponse.getWriter().write("{\"error\": \"토큰이 없습니다.\"}");
+            return;
+        }
 
         // AT 블랙리스트검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
@@ -57,11 +81,5 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         chain.doFilter(request, response);
     }
 
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
+
 }

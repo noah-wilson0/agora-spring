@@ -4,10 +4,10 @@ import com.agora.debate.member.dto.PasswordCheckRequestDto;
 import com.agora.debate.member.dto.update.UpdatePasswordDto;
 import com.agora.debate.member.dto.update.UpdateUserInfoDto;
 import com.agora.debate.member.entity.Member;
-import com.agora.debate.security.JwtUtils;
 import com.agora.debate.member.service.JwtBlacklistService;
 import com.agora.debate.member.service.MemberService;
 import com.agora.debate.member.valid.ValidationGroups;
+import com.agora.debate.security.utils.JwtCookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,8 +32,6 @@ public class MemberUpdateController {
     private final PasswordEncoder passwordEncoder;
     private final JwtBlacklistService jwtBlacklistService;
 
-    private final RedisTemplate redisTemplate;
-
     @PostMapping("/check-password")
     public ResponseEntity<?> checkPassword(@RequestBody @Validated(ValidationGroups.CheckPasswordGroup.class)
                                                PasswordCheckRequestDto passwordCheckRequestDto,
@@ -49,20 +47,21 @@ public class MemberUpdateController {
     /**
      * 비밀번호 수정시 재로그인 요청하기
      * @param updatePasswordDto
-     * @param authorizationHeader
      * @param refreshToken
      * @return
      */
     @PostMapping("/change-password")
     public ResponseEntity<?> updatePassword(
             @RequestBody @Validated(ValidationGroups.UpdatePasswordGroup.class) UpdatePasswordDto updatePasswordDto,
-                                            @RequestHeader("Authorization") String authorizationHeader,
-                                            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+            @CookieValue(value = "accessToken", required = false) String accessToken,
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+
+        if (accessToken == null && refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         updatePasswordDto.setUsername(updatePasswordDto.getUsername());
         memberService.updatePassword(updatePasswordDto);
-
-        String accessToken = JwtUtils.extractAccessToken(authorizationHeader);
 
         // 2. AT 블랙리스트 등록
         if (accessToken != null) {
@@ -72,17 +71,10 @@ public class MemberUpdateController {
         if (refreshToken != null) {
             jwtBlacklistService.addBlacklistToken(refreshToken,"changePassword");
         }
-        // 4. RT 쿠키 삭제 (Set-Cookie로 만료시키기)
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(true) // 개발환경이면 false
-                .path("/")
-                .build();
-
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, JwtCookieUtils.deleteAccessTokenCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, JwtCookieUtils.deleteRefreshTokenCookie().toString())
                 .body("비밀번호 변경 완료");
     }
 
@@ -93,6 +85,7 @@ public class MemberUpdateController {
 
         memberService.updateMemberInfo(updateUserInfoDto, member);
         return ResponseEntity.ok().body("회원정보 업데이트 완료");
+
     }
 
 

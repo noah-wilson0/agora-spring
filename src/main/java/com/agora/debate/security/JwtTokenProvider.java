@@ -24,9 +24,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-/**
- * TODO: exception들 핸들러 처리하기
- */
 @Slf4j
 @Component
 public class  JwtTokenProvider {
@@ -40,25 +37,8 @@ public class  JwtTokenProvider {
     }
 
     public JwtToken generateToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-
-        Date accessTokenExpiresIn = new Date(now + 86400000);
-        String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .setExpiration(new Date(now + 86400000))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        String accessToken = generateAccessToken(authentication, 3600000);
+        String refreshToken = generateRefreshToken(authentication,86400000);
 
         return JwtToken.builder()
                 .grantType("Bearer")
@@ -66,14 +46,16 @@ public class  JwtTokenProvider {
                 .refreshToken(refreshToken)
                 .build();
     }
-    public String generateAccessToken(Authentication authentication) {
+
+
+    public String generateAccessToken(Authentication authentication, long expireMillis) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
 
-        Date accessTokenExpiresIn = new Date(now + 86400000);
+        Date accessTokenExpiresIn = new Date(now + expireMillis);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
@@ -82,6 +64,20 @@ public class  JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    public String generateRefreshToken(Authentication authentication, long expireMillis) {
+
+        long now = System.currentTimeMillis();
+        Date expiresAt = new Date(now + expireMillis);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setExpiration(expiresAt)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
     public Long getExpiryTime(String token) {
         try {
             Claims claims = parseClaims(token);
@@ -128,6 +124,8 @@ public class  JwtTokenProvider {
             log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
+        } catch (SignatureException E) {
+            log.info("유조된 jwt 서명 에러");
         }
         return false;
     }
