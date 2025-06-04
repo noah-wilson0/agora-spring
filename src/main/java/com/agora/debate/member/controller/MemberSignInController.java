@@ -32,7 +32,7 @@ public class MemberSignInController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(3600000)
+                .maxAge(3600)
                 .sameSite("Strict")
                 .build();
 
@@ -40,7 +40,7 @@ public class MemberSignInController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(86400000)
+                .maxAge(86400)
                 .sameSite("Strict")
                 .build();
         return ResponseEntity.ok()

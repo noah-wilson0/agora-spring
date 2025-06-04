@@ -77,10 +77,10 @@ public class MemberService {
         return jwtToken;
     }
     @Transactional
-    public void updatePassword(UpdatePasswordDto updatePasswordDto) {
-        Member member = memberRepository.findByUsername(updatePasswordDto.getUsername())
+    public void updatePassword(String username, UpdatePasswordDto updatePasswordDto) {
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNameNotMatchException());
-        member.changePassword(passwordEncoder.encode(updatePasswordDto.getPassword()));
+        member.changePassword(passwordEncoder.encode(updatePasswordDto.getNewPassword()));
     }
     @Transactional
     public void updateMemberInfo(UpdateUserInfoDto updateUserInfoDto,Member member) {

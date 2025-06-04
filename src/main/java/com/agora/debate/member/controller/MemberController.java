@@ -27,16 +27,16 @@ public class MemberController {
     public ResponseEntity<MemberInfo> getMember(@AuthenticationPrincipal Member member) {
 
                 return ResponseEntity.ok(MemberInfo.builder()
-                .name(member.getName())
-                .username(member.getUsername())
-                .email(member.getEmail())
-                .gender(member.getGender())
-                .birthday(member.getBirthday())
-                .score(member.getScore())
-                .level(member.getLevel())
-                .win(member.getWin())
-                .lose(member.getLose())
-                .build());
+                        .name(member.getName())
+                        .id(member.getUsername())
+                        .email(member.getEmail())
+                        .gender(member.getGender())
+                        .birthday(member.getBirthday())
+                        .score(member.getScore())
+                        .level(member.getLevel())
+                        .win(member.getWin())
+                        .lose(member.getLose())
+                        .build());
     }
 
     @PostMapping("/logout")

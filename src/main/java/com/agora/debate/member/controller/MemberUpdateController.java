@@ -40,29 +40,26 @@ public class MemberUpdateController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("현재 비밀번호가 일치하지 않습니다.");
         }
+
         return ResponseEntity.ok("확인되었습니다.");
 
     }
 
-    /**
-     * 비밀번호 수정시 재로그인 요청하기
-     * @param updatePasswordDto
-     * @param refreshToken
-     * @return
-     */
     @PostMapping("/change-password")
-    public ResponseEntity<?> updatePassword(
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal Member member,
             @RequestBody @Validated(ValidationGroups.UpdatePasswordGroup.class) UpdatePasswordDto updatePasswordDto,
             @CookieValue(value = "accessToken", required = false) String accessToken,
             @CookieValue(value = "refreshToken", required = false) String refreshToken) {
-
+        log.info("비밀번호 변경 시작");
         if (accessToken == null && refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        updatePasswordDto.setUsername(updatePasswordDto.getUsername());
-        memberService.updatePassword(updatePasswordDto);
-
+        if (!updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmNewPassword())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        log.info("비밀번호 변경 진행");
+        memberService.updatePassword(member.getUsername(), updatePasswordDto);
+        log.info("비밀번호 변경 완료");
         // 2. AT 블랙리스트 등록
         if (accessToken != null) {
             jwtBlacklistService.addBlacklistToken(accessToken,"changePassword");
