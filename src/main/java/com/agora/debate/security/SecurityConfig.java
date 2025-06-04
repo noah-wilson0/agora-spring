@@ -25,15 +25,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
-                        .requestMatchers("/members/login","/members/sign-in").permitAll()
+                        .requestMatchers("/members/login","/members/sign-in", "/ws-chat/**").permitAll()
+                        .requestMatchers("/api/chat/history").permitAll()
                         .requestMatchers("/members/me","/auth/refresh","/auth/me", "/members/update/check-password","/members/update/change-password","/members/logout","/members/update/change-info").hasRole("USER")
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();
     }
