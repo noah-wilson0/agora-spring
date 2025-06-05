@@ -1,6 +1,9 @@
 package com.agora.debate.member.service;
 
 
+import com.agora.debate.member.dto.signup.CheckEmailDto;
+import com.agora.debate.member.dto.signup.CheckNameDto;
+import com.agora.debate.member.dto.signup.CheckUsernameDto;
 import com.agora.debate.member.exception.UserNameNotMatchException;
 import com.agora.debate.member.dto.signin.SignInDto;
 import com.agora.debate.member.dto.signup.SignUpDto;
@@ -39,7 +42,7 @@ public class MemberService {
     private final RedisTemplate redisTemplate;
     @Transactional
     public Member register(SignUpDto signDto) {
-        memberPolicyValidator.validateSignUpDto(signDto);
+        memberPolicyValidator.duplicateSignUpDto(signDto);
 
         return memberRepository.save(Member.builder()
                 .name(signDto.getName())
@@ -108,5 +111,17 @@ public class MemberService {
     }
 
 
+    public void duplicateName(CheckNameDto checkNameDto) {
+        memberPolicyValidator.duplicateName(checkNameDto);
 
+    }
+
+    public void duplicateUserName(CheckUsernameDto checkUsernameDto) {
+        memberPolicyValidator.duplicateUserName(checkUsernameDto);
+    }
+
+    public void duplicateEmail(CheckEmailDto checkEmailDto) {
+        memberPolicyValidator.duplicateEmail(checkEmailDto);
+
+    }
 }

@@ -31,8 +31,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
-                        .requestMatchers("/members/login","/members/sign-in").permitAll()
-                        .requestMatchers("/members/me","/auth/refresh","/auth/me", "/members/update/check-password","/members/update/change-password","/members/logout","/members/update/change-info").hasRole("USER")
+                        .requestMatchers("/members/login","/members/sign-in","/members/signup",
+                                "/members/signup/check-id","/members/signup/check-name","/members/signup/check-email").permitAll()
+                        .requestMatchers("/members/me","/auth/refresh","/auth/me",
+                                "/members/update/check-password","/members/update/change-password",
+                                "/members/logout","/members/update/change-info").hasRole("USER")
 
                         .anyRequest().authenticated()
                 )
