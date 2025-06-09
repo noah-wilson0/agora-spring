@@ -9,6 +9,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
+import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
 
@@ -31,11 +33,10 @@ public class SecurityConfig {
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
-                        .requestMatchers("/members/login","/members/sign-in", "/ws-chat/**").permitAll()
-                        .requestMatchers("/api/chat/history").permitAll()
+                        .requestMatchers("/members/login","/members/sign-in", "/ws-chat/**", "/api/chat/history").permitAll()
                         .requestMatchers("/members/me","/auth/refresh","/auth/me", "/members/update/check-password","/members/update/change-password","/members/logout","/members/update/change-info").hasRole("USER")
 
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();
     }
@@ -46,4 +47,16 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages
+                .simpDestMatchers("/pub/**").hasRole("USER")      // publish는 USER만
+                .simpSubscribeDestMatchers("/sub/**").permitAll();  // subscribe는 모두 허용
+//                .anyMessage().denyAll();
+    }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
 }

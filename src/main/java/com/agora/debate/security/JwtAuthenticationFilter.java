@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         // 필터를 적용하지 않을 경로 설정
         if (path.startsWith("/members/sign-in") || path.startsWith("/members/sign-in/test")
-                || path.startsWith("/members/signup") || path.startsWith("/ws-chat") || path.startsWith("/api/chat")) {
+                || path.startsWith("/members/signup") || path.startsWith("/ws-chat") || path.startsWith("/api/chat/history")) {
             chain.doFilter(request, response);
             return;
         }
