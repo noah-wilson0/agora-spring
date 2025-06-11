@@ -77,6 +77,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인되지 않은 사용자");
         }
         log.info("로그인한 사용자");
-        return ResponseEntity.ok().body(Map.of("name", member.getName()));
+        return ResponseEntity.ok().body(Map.of("name", member.getName(),"type",member.getSocialType()));
     }
 }

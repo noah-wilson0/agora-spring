@@ -10,20 +10,17 @@ import com.agora.debate.member.valid.ValidationGroups;
 import com.agora.debate.security.utils.JwtCookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/members/update")
 @RequiredArgsConstructor
 public class MemberUpdateController {

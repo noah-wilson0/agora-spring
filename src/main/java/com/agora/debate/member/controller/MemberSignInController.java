@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
-@RequestMapping("/members/sign-in")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberSignInController {
     private final MemberService memberService;
 
-    @PostMapping
+    @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody @Validated(ValidationGroups.SignInGroup.class) SignInDto signInDto) {
         log.info("토큰 생성 시작");
         log.info(signInDto.getUsername());
@@ -48,5 +48,6 @@ public class MemberSignInController {
                 .header(HttpHeaders.SET_COOKIE,rtCookie.toString())
                 .body(jwtToken);
     }
+
 
 }

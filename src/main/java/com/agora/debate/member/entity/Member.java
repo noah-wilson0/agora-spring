@@ -1,6 +1,7 @@
 package com.agora.debate.member.entity;
 
 import com.agora.debate.global.enums.Gender;
+import com.agora.debate.global.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +30,10 @@ public class Member implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "social_type", nullable = false)
+    private SocialType socialType;
 
     @Column(nullable = false,unique = true)
     private String name;

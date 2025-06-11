@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * TODO: naver떄문에  .cors(Customizer.withDefaults()) 다시 썻는데 rest api인데
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
@@ -32,7 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
                         .requestMatchers("/members/login","/members/sign-in","/members/signup",
-                                "/members/signup/check-id","/members/signup/check-name","/members/signup/check-email").permitAll()
+                                "/members/signup/check-id","/members/signup/check-name","/members/signup/check-email",
+                                "/oauth/naver","/oauth/kakao").permitAll()
                         .requestMatchers("/members/me","/auth/refresh","/auth/me",
                                 "/members/update/check-password","/members/update/change-password",
                                 "/members/logout","/members/update/change-info").hasRole("USER")

@@ -1,6 +1,7 @@
 package com.agora.debate.member.service;
 
 
+import com.agora.debate.global.enums.SocialType;
 import com.agora.debate.member.dto.signup.CheckEmailDto;
 import com.agora.debate.member.dto.signup.CheckNameDto;
 import com.agora.debate.member.dto.signup.CheckUsernameDto;
@@ -45,6 +46,7 @@ public class MemberService {
         memberPolicyValidator.duplicateSignUpDto(signDto);
 
         return memberRepository.save(Member.builder()
+                        .socialType(SocialType.NORMAL)
                 .name(signDto.getName())
                 .username(signDto.getUsername())
                 .password(passwordEncoder.encode(signDto.getPassword()))
