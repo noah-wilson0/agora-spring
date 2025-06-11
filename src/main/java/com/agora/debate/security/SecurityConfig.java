@@ -50,9 +50,9 @@ public class SecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfig
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
         messages
-                .simpDestMatchers("/pub/**").hasRole("USER")      // publish는 USER만
+//                .simpDestMatchers("/pub/**").hasRole("USER")      // publish는 USER만
                 .simpSubscribeDestMatchers("/sub/**").permitAll();  // subscribe는 모두 허용
-//                .anyMessage().denyAll();
+//                .anyMessage().denyAll();  //아마 안 쓰일 코드
     }
 
     @Override

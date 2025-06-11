@@ -7,11 +7,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ChatMessage {
+    private String team;
     private Long roomId;
     private String chatType;
-    private String sender;
+    private String username;
     private String message;
-    private LocalDateTime sentAt;
+    private LocalDateTime timestamp;
 
     public String getChanel() { return "topic-" + roomId.toString() + "-" + chatType; }
     public String getKey() { return "chat:room:" + getChanel(); }
