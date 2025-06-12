@@ -39,3 +39,6 @@ out/
 
 ### 민감한 설정 파일 (Git에 포함 금지) ###
 src/main/resources/application-secret-*.properties
+src/main/resources/application-*-secret.properties
+/src/main/resources/application-local-secret.properties
+/src/main/resources/application-release-secret.properties

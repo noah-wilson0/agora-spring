@@ -9,19 +9,18 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
+import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * TODO: naver떄문에  .cors(Customizer.withDefaults()) 다시 썻는데 rest api인데
- */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
 
@@ -29,12 +28,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .cors(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
+                        .requestMatchers("/members/login","/members/sign-in", "/ws-chat/**", "/api/chat/history").permitAll()
+                        .requestMatchers("/members/me","/auth/refresh","/auth/me", "/members/update/check-password","/members/update/change-password","/members/logout","/members/update/change-info").hasRole("USER")
                         .requestMatchers("/members/login","/members/sign-in","/members/signup",
                                 "/members/signup/check-id","/members/signup/check-name","/members/signup/check-email",
                                 "/oauth/naver","/oauth/kakao").permitAll()
@@ -53,4 +56,16 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages
+//                .simpDestMatchers("/pub/**").hasRole("USER")      // publish는 USER만
+                .simpSubscribeDestMatchers("/sub/**").permitAll();  // subscribe는 모두 허용
+//                .anyMessage().denyAll();  //아마 안 쓰일 코드
+    }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
 }

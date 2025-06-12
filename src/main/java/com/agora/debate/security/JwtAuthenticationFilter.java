@@ -40,8 +40,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         // 필터를 적용하지 않을 경로 설정
         if (path.startsWith("/members/sign-in") || path.startsWith("/members/sign-in/test")
-                || path.startsWith("/members/signup") || path.startsWith("/oauth/naver") || path.startsWith("/oauth/kakao")) {
-            log.info("비회원 요청 - 필터 우회");
+                || path.startsWith("/members/signup") || path.startsWith("/ws-chat") || path.startsWith("/api/chat/history")) {
             chain.doFilter(request, response);
             return;
         }
