@@ -36,11 +36,10 @@ public class SecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfig
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
-                        .requestMatchers("/members/login","/members/sign-in", "/ws-chat/**", "/api/chat/history").permitAll()
-                        .requestMatchers("/members/me","/auth/refresh","/auth/me", "/members/update/check-password","/members/update/change-password","/members/logout","/members/update/change-info").hasRole("USER")
                         .requestMatchers("/members/login","/members/sign-in","/members/signup",
                                 "/members/signup/check-id","/members/signup/check-name","/members/signup/check-email",
-                                "/oauth/naver","/oauth/kakao").permitAll()
+                                "/oauth/naver","/oauth/kakao",
+                                "/ws-chat/**", "/api/chat/history").permitAll()
                         .requestMatchers("/members/me","/auth/refresh","/auth/me",
                                 "/members/update/check-password","/members/update/change-password",
                                 "/members/logout","/members/update/change-info").hasRole("USER")
