@@ -42,7 +42,8 @@ public class SecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfig
                                 "/ws-chat/**", "/api/chat/history").permitAll()
                         .requestMatchers("/members/me","/auth/refresh","/auth/me",
                                 "/members/update/check-password","/members/update/change-password",
-                                "/members/logout","/members/update/change-info").hasRole("USER")
+                                "/members/logout","/members/update/change-info",
+                                "/api/boards").hasRole("USER")
 
                         .anyRequest().authenticated()
                 )

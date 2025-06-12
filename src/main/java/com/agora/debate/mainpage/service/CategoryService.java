@@ -1,6 +1,6 @@
 package com.agora.debate.mainpage.service;
 
-import com.agora.debate.mainpage.domain.Category;
+import com.agora.debate.debate.entity.Category;
 import com.agora.debate.mainpage.dto.CategoryDto;
 import com.agora.debate.mainpage.repository.CategoryRepository;
 import org.springframework.stereotype.Service;

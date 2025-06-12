@@ -1,6 +1,6 @@
 package com.agora.debate;
 
-import com.agora.debate.mainpage.domain.Category;
+import com.agora.debate.debate.entity.Category;
 import com.agora.debate.mainpage.service.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

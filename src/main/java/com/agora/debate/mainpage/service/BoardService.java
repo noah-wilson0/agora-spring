@@ -1,6 +1,5 @@
 package com.agora.debate.mainpage.service;
 
-import com.agora.debate.mainpage.domain.Board;
 import com.agora.debate.mainpage.dto.BoardDto;
 import com.agora.debate.mainpage.repository.BoardRepository;
 import org.springframework.stereotype.Service;

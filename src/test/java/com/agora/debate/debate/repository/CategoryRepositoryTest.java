@@ -1,8 +1,7 @@
 package com.agora.debate.debate.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.agora.debate.debate.entity.Category;
+import com.agora.debate.mainpage.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
