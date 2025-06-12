@@ -2,6 +2,8 @@ package com.agora.debate.mainpage.controller;
 
 import com.agora.debate.mainpage.dto.BoardDto;
 import com.agora.debate.mainpage.service.BoardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @RequestMapping("/api/boards")
 public class BoardController {
 
+    private static final Logger log = LoggerFactory.getLogger(BoardController.class);
     private final BoardService boardService;
 
     public BoardController(BoardService boardService) {
@@ -21,7 +24,9 @@ public class BoardController {
     // CREATE
     @PostMapping
     public ResponseEntity<Boolean> createBoard(@RequestBody BoardDto boardDto) {
+        log.info("성공");
         boolean result = boardService.createBoard(boardDto);
+        log.info("faile");
         return ResponseEntity.ok(result);
     }
 
@@ -34,6 +39,7 @@ public class BoardController {
     // READ ONE
     @GetMapping("/{id}")
     public ResponseEntity<BoardDto> getBoard(@PathVariable Long id) {
+        log.info("시작");
         BoardDto board = boardService.getBoard(id);
         return board != null ? ResponseEntity.ok(board) : ResponseEntity.notFound().build();
     }
