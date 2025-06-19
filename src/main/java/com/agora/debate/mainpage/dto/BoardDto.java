@@ -9,14 +9,16 @@ public class BoardDto {
     private String title;
     @JsonProperty("category_id")
     private int categoryId;
+    private String description;
     private String state;
     private LocalDate createdAt;
 
     public BoardDto() {}
 
-    public BoardDto(Long boardId, String title, int categoryId, String state, LocalDate createdAt) {
+    public BoardDto(Long boardId, String title, int categoryId, String description, String state, LocalDate createdAt) {
         this.boardId = boardId;
         this.title = title;
+        this.description=description;
         this.categoryId = categoryId;
         this.state = state;
         this.createdAt = createdAt;
@@ -24,6 +26,8 @@ public class BoardDto {
 
     // getter / setter 생략하지 말고 다 만들어주세요.
     // IDE로 자동 생성 가능
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public Long getBoardId() { return boardId; }
     public void setBoardId(Long boardId) { this.boardId = boardId; }
     public String getTitle() { return title; }

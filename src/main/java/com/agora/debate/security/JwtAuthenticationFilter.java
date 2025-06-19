@@ -35,13 +35,22 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             chain.doFilter(request, response);
             return;
         }
+        // 쿠키 존재 여부 로그
+        if (httpRequest.getCookies() != null) {
+            log.info("✅ 쿠키 존재 - 총 {}개", httpRequest.getCookies().length);
+            for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
+                log.info("쿠키 이름 = {}, 값 = {}", cookie.getName(), cookie.getValue());
 
+                if ("accessToken".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                }
+            }
+        }
         String path = httpRequest.getRequestURI();
 
         // 필터를 적용하지 않을 경로 설정
         if (path.startsWith("/members/sign-in") || path.startsWith("/members/sign-in/test") || path.startsWith("/members/signup") ||
-                path.startsWith("/ws-chat") || path.startsWith("/api/chat/history") ||
-                path.startsWith("/api/boards")) {
+                path.startsWith("/ws-chat") || path.startsWith("/api/chat/history")) {
             chain.doFilter(request, response);
             return;
         }
